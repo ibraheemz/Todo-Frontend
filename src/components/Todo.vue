@@ -1,13 +1,15 @@
 <template>
   <div
     v-if="!showUpdateForm"
-    @dblclick="$emit('toggle-reminder', todo.id)"
-    @click="updateForm"
-    class="todo"
+    @dblclick="checkTodo"
+    :class="[todo.checked ? 'checked' : '', 'todo']"
   >
+    <div class="todo-buttons">
+      <i id="edit" @click.stop="updateForm" class="fas fa-edit"></i>
+      <i id="close" @click.stop="onDelete(todo.id)" class="fas fa-times"></i>
+    </div>
     <h3>
       {{ todo.title }}
-      <i id="close" @click.stop="onDelete(todo.id)" class="fas fa-times"></i>
     </h3>
     <p>
       {{ todo.description }}
@@ -46,7 +48,7 @@ export default {
     viewTodo(showForm) {
       !showForm ? (this.showUpdateForm = false) : (this.showUpdateForm = true);
     },
-    async putTodo(todo) {
+    async putTodo(todo, reload = false) {
       const res = await fetch(`${api}/${todo.id}`, {
         method: "PUT",
         headers: {
@@ -56,10 +58,16 @@ export default {
         body: JSON.stringify(todo),
       });
       const data = await res.json();
-      window.location.href = "/";
+      if (reload) {
+        window.location.href = "/";
+      }
     },
     updateTodo(todo) {
-      this.putTodo(todo);
+      this.putTodo(todo, true);
+    },
+    checkTodo() {
+      this.todo.checked = !this.todo.checked;
+      this.putTodo(this.todo);
     },
   },
   components: { EditTodo },
@@ -78,7 +86,7 @@ export default {
   cursor: pointer;
 }
 
-.todo.reminder {
+.todo.checked {
   border-left: 5px solid green;
 }
 
@@ -86,5 +94,13 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.todo-buttons {
+  display: flex;
+  justify-content: end;
+}
+#close {
+  margin-left: 10px;
 }
 </style>
