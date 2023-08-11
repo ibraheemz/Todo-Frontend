@@ -38,6 +38,17 @@ export default {
           : alert("Error deleting this todo");
       }
     },
+
+    async getTodos() {
+      const res = await fetch(`${api}`);
+      const data = await res.json();
+      return data;
+    },
+    async getTodo(id) {
+      const res = await fetch(`${api}/${id}`);
+      const data = await res.json();
+      return data;
+    },
     async addTodo(todo) {
       const res = await fetch(`${api}`, {
         method: "POST",
@@ -49,16 +60,6 @@ export default {
       });
       const data = await res.json();
       this.todos = [...this.todos, data];
-    },
-    async getTodos() {
-      const res = await fetch(`${api}`);
-      const data = await res.json();
-      return data;
-    },
-    async getTodo(id) {
-      const res = await fetch(`${api}/${id}`);
-      const data = await res.json();
-      return data;
     },
   },
   async created() {

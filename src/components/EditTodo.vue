@@ -1,8 +1,8 @@
 <template>
-  <form @submit="onSubmit" class="add-form">
+  <form v-if="showForm" @submit="onUpdate" class="add-form">
     <div class="form-control">
       <label>Todo</label>
-      <input type="text" v-model="title" name="title" placeholder="Add Todo" />
+      <input type="text" v-model="title" name="title" />
     </div>
     <div class="form-control">
       <label>Description</label>
@@ -14,33 +14,41 @@
       />
     </div>
     <input type="submit" value="Save Todo" class="btn btn-block" />
+    <button @click="closeForm" value="Close" class="btn btn-block">
+      Close
+    </button>
   </form>
 </template>
 
 <script>
 export default {
   name: "AddTodo",
+  props: { todo: Object },
   data() {
     return {
-      title: "",
-      description: "",
+      title: this.todo.title ?? "",
+      description: this.todo.title ?? "",
+      showForm: true,
     };
   },
   methods: {
-    onSubmit(e) {
+    onUpdate(e) {
       e.preventDefault();
       if (!this.title) {
-        alert("Please add a Todo");
+        alert("You can't leave the title empty");
         return;
       }
-      const newTodo = {
+      const updatedTodo = {
         title: this.title,
         description: this.description,
+        id: this.todo.id,
       };
-
-      this.$emit("add-todo", newTodo);
-
-      (this.title = ""), (this.description = "");
+      this.$emit("updateTodo", updatedTodo);
+      this.$emit("closeForm", this.showForm);
+    },
+    closeForm() {
+      this.showForm = !this.showForm;
+      this.$emit("closeForm", this.showForm);
     },
   },
 };
