@@ -62,7 +62,7 @@ export default {
     },
   },
   async created() {
-    this.Todos = await this.getTodos();
+    this.todos = await this.getTodos();
   },
 };
 </script>
