@@ -10,28 +10,15 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import Header from "./components/Header";
 import Home from "./components/Home";
 import Footer from "./components/Footer";
+import { ref, onMounted } from "vue";
 
-export default {
-  name: "App",
-  components: {
-    Header,
-    Home,
-    Footer,
-  },
-  data() {
-    return {
-      showAddTodo: false,
-    };
-  },
-  methods: {
-    toggleAddTodo() {
-      this.showAddTodo = !this.showAddTodo;
-    },
-  },
+let showAddTodo = ref(false);
+const toggleAddTodo = () => {
+  showAddTodo.value = !showAddTodo.value;
 };
 </script>
 

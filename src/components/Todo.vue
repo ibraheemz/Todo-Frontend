@@ -18,59 +18,50 @@
   </div>
   <EditTodo
     v-if="showUpdateForm"
-    :todo="this.todo"
+    :todo="todo"
     @updateTodo="updateTodo"
     @closeForm="viewTodo"
   />
 </template>
 
-<script>
+<script setup>
 import EditTodo from "./EditTodo.vue";
-const api = "http://localhost:8000/api/todos";
+import todosApi from "../services/todosApi";
 
-export default {
-  name: "Todo",
-  data() {
-    return {
-      showUpdateForm: false,
-    };
-  },
-  props: {
-    todo: Object,
-  },
-  methods: {
-    onDelete(id) {
-      this.$emit("delete-todo", id);
-    },
-    updateForm() {
-      this.showUpdateForm = !this.showUpdateForm;
-    },
-    viewTodo(showForm) {
-      !showForm ? (this.showUpdateForm = false) : (this.showUpdateForm = true);
-    },
-    async putTodo(todo, reload = false) {
-      const res = await fetch(`${api}/${todo.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(todo),
-      });
-      const data = await res.json();
-      if (reload) {
-        window.location.href = "/";
-      }
-    },
-    updateTodo(todo) {
-      this.putTodo(todo, true);
-    },
-    checkTodo() {
-      this.todo.checked = !this.todo.checked;
-      this.putTodo(this.todo);
-    },
-  },
-  components: { EditTodo },
+let showUpdateForm = false;
+
+const { todo } = defineProps(["todo"]);
+
+const emits = defineEmits(["delete-todo"]);
+const onDelete = (id) => {
+  emits("delete-todo", id);
+};
+
+const updateForm = () => {
+  showUpdateForm = !showUpdateForm;
+};
+const viewTodo = (showForm) => {
+  !showForm ? (showUpdateForm = false) : (showUpdateForm = true);
+};
+const putTodo = (todo, reload = false) => {
+  todosApi
+    .put(`/${todo.id}`, todo)
+    .then(() => {
+      console.log("todo updated");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  if (reload) {
+    window.location.href = "/";
+  }
+};
+const updateTodo = (todo) => {
+  putTodo(todo, true);
+};
+const checkTodo = () => {
+  todo.checked = !todo.checked;
+  putTodo(todo);
 };
 </script>
 

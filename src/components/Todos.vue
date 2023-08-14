@@ -8,17 +8,12 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import Todo from "./Todo.vue";
 
-export default {
-  name: "Todos",
-  props: {
-    todos: Array,
-  },
-  components: {
-    Todo,
-  },
-  emits: ["delete-todo", "toggle-reminder"],
-};
+const props = defineProps({
+  todos: Array,
+});
+
+const emits = defineEmits(["delete-todo", "toggle-reminder"]);
 </script>

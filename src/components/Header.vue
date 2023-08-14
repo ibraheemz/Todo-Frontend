@@ -9,19 +9,13 @@
   </header>
 </template>
 
-<script>
+<script setup>
 import Button from "./Button.vue";
 
-export default {
-  name: "Header",
-  props: {
-    title: String,
-    showAddTodo: Boolean,
-  },
-  components: {
-    Button,
-  },
-};
+const props = defineProps({
+  title: String,
+  showAddTodo: Boolean,
+});
 </script>
 
 <style scoped>

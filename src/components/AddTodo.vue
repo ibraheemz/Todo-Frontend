@@ -17,32 +17,38 @@
   </form>
 </template>
 
-<script>
-export default {
-  name: "AddTodo",
-  data() {
-    return {
-      title: "",
-      description: "",
-    };
-  },
-  methods: {
-    onSubmit(e) {
-      e.preventDefault();
-      if (!this.title) {
-        alert("Please add a Todo");
-        return;
-      }
-      const newTodo = {
-        title: this.title,
-        description: this.description,
-      };
+<script setup>
+import { ref } from "vue";
+import todosApi from "../services/todosApi";
 
-      this.$emit("add-todo", newTodo);
+let title = ref("");
+let description = ref("");
+let checked = false;
 
-      (this.title = ""), (this.description = "");
-    },
-  },
+const onSubmit = (e) => {
+  e.preventDefault();
+  if (!title) {
+    alert("Please add a Todo title");
+    return;
+  }
+  const newTodo = {
+    title: title.value,
+    description: description.value,
+    checked: checked,
+  };
+
+  addTodo(newTodo);
+};
+
+const addTodo = async (todo) => {
+  todosApi
+    .post("", todo)
+    .then((res) => {
+      alert("todo added!");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 </script>
 

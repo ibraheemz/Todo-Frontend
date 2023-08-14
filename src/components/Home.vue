@@ -1,69 +1,50 @@
 <template>
-  <Todos @delete-todo="deleteTodo" :todos="todos" v-if="!showAddTodo"></Todos>
-  <AddTodo @add-todo="addTodo" v-show="showAddTodo"></AddTodo>
+  <Todos
+    @delete-todo="deleteTodo"
+    :todos="todos"
+    :isLoading="isLoading"
+    v-if="!showAddTodo"
+  ></Todos>
+  <AddTodo v-show="showAddTodo"></AddTodo>
 </template>
 
-<script>
+<script setup>
 import Todos from "../components/Todos.vue";
 import AddTodo from "../components/AddTodo";
+import todosApi from "../services/todosApi";
+import { ref, onMounted } from "vue";
 
 const api = "http://localhost:8000/api/todos";
 
-export default {
-  name: "Home",
-  props: {
-    showAddTodo: Boolean,
-  },
-  components: {
-    Todos,
-    AddTodo,
-  },
-  data() {
-    return {
-      todos: [],
-    };
-  },
-  methods: {
-    async deleteTodo(id) {
-      if (confirm("Are you sure?")) {
-        const res = await fetch(`${api}/${id}`, {
-          method: "DELETE",
-          headers: {
-            Accept: "application/json",
-          },
-        });
+const props = defineProps({
+  showAddTodo: Boolean,
+});
+let todos = ref([]);
+let isLoading = ref(false);
 
-        res.status === 200
-          ? (this.todos = this.todos.filter((todo) => todo.id !== id))
-          : alert("Error deleting this todo");
-      }
-    },
-
-    async getTodos() {
-      const res = await fetch(`${api}`);
-      const data = await res.json();
-      return data;
-    },
-    async getTodo(id) {
-      const res = await fetch(`${api}/${id}`);
-      const data = await res.json();
-      return data;
-    },
-    async addTodo(todo) {
-      const res = await fetch(`${api}`, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(todo),
+const deleteTodo = async (id) => {
+  if (confirm("Are you sure?")) {
+    todosApi
+      .delete(`/${id}`)
+      .then(() => {
+        todos.value = todos.value.filter((todo) => todo.id !== id);
+      })
+      .catch((err) => {
+        console.log(err);
       });
-      const data = await res.json();
-      this.todos = [...this.todos, data];
-    },
-  },
-  async created() {
-    this.todos = await this.getTodos();
-  },
+  }
 };
+
+const getTodos = async () => {
+  todosApi.get().then((res) => {
+    console.log(res);
+    todos.value = res.data;
+    isLoading = false;
+  });
+};
+
+onMounted(() => {
+  getTodos();
+  console.log("home mounted");
+});
 </script>
